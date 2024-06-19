@@ -29,6 +29,8 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
 
     void setCommonFieldsFromActionDTOIntoNewAction(ActionDTO action, NewAction newAction);
 
+    Mono<NewAction> findByIdAndBranchName(String id, String branchName);
+
     ActionDTO generateActionByViewMode(NewAction newAction, Boolean viewMode);
 
     void generateAndSetActionPolicies(NewPage page, NewAction action);
@@ -46,7 +48,7 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
     Mono<ActionDTO> updateUnpublishedAction(String id, ActionDTO action);
 
     Mono<Tuple2<ActionDTO, NewAction>> updateUnpublishedActionWithoutAnalytics(
-            String id, ActionDTO action, Optional<AclPermission> permission);
+            String id, ActionDTO action, AclPermission permission);
 
     Mono<ActionDTO> findByUnpublishedNameAndPageId(String name, String pageId, AclPermission permission);
 
@@ -82,8 +84,7 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
 
     Mono<ActionDTO> deleteUnpublishedAction(String id);
 
-    Mono<ActionDTO> deleteUnpublishedActionWithOptionalPermission(
-            String id, Optional<AclPermission> newActionDeletePermission);
+    Mono<ActionDTO> deleteUnpublishedAction(String id, AclPermission newActionDeletePermission);
 
     Flux<ActionDTO> getUnpublishedActions(MultiValueMap<String, String> params, Boolean includeJsActions);
 
@@ -96,6 +97,8 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
 
     Flux<ActionDTO> getUnpublishedActions(MultiValueMap<String, String> params, String branchName);
 
+    Mono<ActionDTO> deleteGivenNewAction(NewAction toDelete);
+
     Mono<ActionDTO> populateHintMessages(ActionDTO action);
 
     Mono<NewAction> save(NewAction action);
@@ -103,6 +106,8 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
     Flux<NewAction> saveAll(List<NewAction> actions);
 
     Flux<NewAction> findByPageId(String pageId);
+
+    Mono<NewAction> archiveGivenNewAction(NewAction toDelete);
 
     Mono<NewAction> archive(NewAction newAction);
 
@@ -160,4 +165,6 @@ public interface NewActionServiceCE extends CrudService<NewAction, String> {
     void updateDefaultResourcesInAction(NewAction newAction);
 
     Mono<Void> saveLastEditInformationInParent(ActionDTO actionDTO);
+
+    Flux<NewAction> findByCollectionIdAndViewMode(String collectionId, boolean viewMode, AclPermission aclPermission);
 }

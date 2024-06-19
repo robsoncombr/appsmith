@@ -11,7 +11,7 @@ import com.appsmith.server.exceptions.AppsmithErrorCode;
 import com.appsmith.server.exports.internal.ExportService;
 import com.appsmith.server.exports.internal.partial.PartialExportService;
 import com.appsmith.server.fork.internal.ApplicationForkingService;
-import com.appsmith.server.helpers.GitFileUtils;
+import com.appsmith.server.helpers.CommonGitFileUtils;
 import com.appsmith.server.helpers.RedisUtils;
 import com.appsmith.server.imports.internal.ImportService;
 import com.appsmith.server.imports.internal.partial.PartialImportService;
@@ -20,7 +20,7 @@ import com.appsmith.server.services.ApplicationPageService;
 import com.appsmith.server.services.ApplicationSnapshotService;
 import com.appsmith.server.services.SessionUserService;
 import com.appsmith.server.services.UserDataService;
-import com.appsmith.server.solutions.ApplicationFetcher;
+import com.appsmith.server.solutions.UserReleaseNotes;
 import com.appsmith.server.themes.base.ThemeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,7 +59,7 @@ public class ApplicationControllerTest {
     ApplicationPageService applicationPageService;
 
     @MockBean
-    ApplicationFetcher applicationFetcher;
+    UserReleaseNotes applicationFetcher;
 
     @MockBean
     ApplicationForkingService applicationForkingService;
@@ -83,7 +83,7 @@ public class ApplicationControllerTest {
     AnalyticsService analyticsService;
 
     @MockBean
-    GitFileUtils gitFileUtils;
+    CommonGitFileUtils commonGitFileUtils;
 
     @MockBean
     SessionUserService sessionUserService;

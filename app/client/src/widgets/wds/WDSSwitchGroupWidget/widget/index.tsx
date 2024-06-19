@@ -4,7 +4,7 @@ import BaseWidget from "widgets/BaseWidget";
 import type { WidgetState } from "widgets/BaseWidget";
 import type { SetterConfig } from "entities/AppTheming";
 import type { AnvilConfig } from "WidgetProvider/constants";
-import { Switch, SwitchGroup } from "@design-system/widgets";
+import { Switch, ToggleGroup } from "@design-system/widgets";
 import type { DerivedPropertiesMap } from "WidgetProvider/factory";
 import { EventType } from "constants/AppsmithActionConstants/ActionConstants";
 
@@ -16,7 +16,8 @@ import {
   metaConfig,
   propertyPaneContentConfig,
   settersConfig,
-} from "./../config";
+  methodsConfig,
+} from "../config";
 import { validateInput } from "./helpers";
 import type { SwitchGroupWidgetProps, OptionProps } from "./types";
 
@@ -78,6 +79,10 @@ class WDSSwitchGroupWidget extends BaseWidget<
     };
   }
 
+  static getMethods() {
+    return methodsConfig;
+  }
+
   componentDidUpdate(prevProps: SwitchGroupWidgetProps) {
     if (
       xor(this.props.defaultSelectedValues, prevProps.defaultSelectedValues)
@@ -115,21 +120,25 @@ class WDSSwitchGroupWidget extends BaseWidget<
     const validation = validateInput(this.props);
 
     return (
-      <SwitchGroup
+      <ToggleGroup
         {...rest}
         contextualHelp={labelTooltip}
         errorMessage={validation.errorMessage}
+        isInvalid={validation.validationStatus === "invalid"}
+        items={options}
         onChange={this.onChange}
-        optionsLabelPosition={labelPosition}
-        validationState={validation.validationStatus}
         value={selectedValues}
       >
-        {options.map((option, index) => (
-          <Switch key={`${widgetId}-option-${index}`} value={option.value}>
-            {option.label}
+        {({ index, label, value }) => (
+          <Switch
+            key={`${widgetId}-option-${index}`}
+            labelPosition={labelPosition}
+            value={value}
+          >
+            {label}
           </Switch>
-        ))}
-      </SwitchGroup>
+        )}
+      </ToggleGroup>
     );
   }
 }

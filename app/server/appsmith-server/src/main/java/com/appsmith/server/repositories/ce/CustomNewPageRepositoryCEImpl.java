@@ -7,6 +7,7 @@ import com.appsmith.server.domains.NewPage;
 import com.appsmith.server.dtos.PageDTO;
 import com.appsmith.server.helpers.ce.bridge.Bridge;
 import com.appsmith.server.helpers.ce.bridge.BridgeQuery;
+import com.appsmith.server.helpers.ce.bridge.BridgeUpdate;
 import com.appsmith.server.repositories.BaseAppsmithRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -39,14 +41,6 @@ public class CustomNewPageRepositoryCEImpl extends BaseAppsmithRepositoryImpl<Ne
         return queryBuilder()
                 .criteria(Bridge.equal(NewPage.Fields.applicationId, applicationId))
                 .permission(aclPermission)
-                .all();
-    }
-
-    @Override
-    public Flux<NewPage> findByApplicationId(String applicationId, Optional<AclPermission> permission) {
-        return queryBuilder()
-                .criteria(Bridge.equal(NewPage.Fields.applicationId, applicationId))
-                .permission(permission.orElse(null))
                 .all();
     }
 
@@ -168,6 +162,20 @@ public class CustomNewPageRepositoryCEImpl extends BaseAppsmithRepositoryImpl<Ne
         return queryBuilder().criteria(q).permission(permission).one();
     }
 
+    public Mono<String> findBranchedPageId(String branchName, String defaultPageId, AclPermission permission) {
+        final BridgeQuery<NewPage> q =
+                // defaultPageIdCriteria
+                Bridge.equal(NewPage.Fields.defaultResources_pageId, defaultPageId);
+        q.equal(NewPage.Fields.defaultResources_branchName, branchName);
+
+        return queryBuilder()
+                .criteria(q)
+                .permission(permission)
+                .fields("id")
+                .one()
+                .map(NewPage::getId);
+    }
+
     @Override
     public Flux<NewPage> findSlugsByApplicationIds(List<String> applicationIds, AclPermission aclPermission) {
         return queryBuilder()
@@ -210,8 +218,7 @@ public class CustomNewPageRepositoryCEImpl extends BaseAppsmithRepositoryImpl<Ne
     public Mono<Void> publishPages(Collection<String> pageIds, AclPermission permission) {
         Criteria applicationIdCriteria = where(NewPage.Fields.id).in(pageIds);
 
-        Mono<Set<String>> permissionGroupsMono =
-                getCurrentUserPermissionGroupsIfRequired(Optional.ofNullable(permission));
+        Mono<Set<String>> permissionGroupsMono = getCurrentUserPermissionGroupsIfRequired(permission);
 
         return permissionGroupsMono.flatMap(permissionGroups -> {
             return Mono.fromCallable(() -> {
@@ -245,5 +252,14 @@ public class CustomNewPageRepositoryCEImpl extends BaseAppsmithRepositoryImpl<Ne
                 .criteria(Bridge.in(FieldName.APPLICATION_ID, applicationIds))
                 .fields(includeFields)
                 .all();
+    }
+
+    @Override
+    public Mono<Integer> updateDependencyMap(String pageId, Map<String, List<String>> dependencyMap) {
+        final BridgeQuery<NewPage> q = Bridge.equal(NewPage.Fields.id, pageId);
+
+        BridgeUpdate update = Bridge.update();
+        update.set(NewPage.Fields.unpublishedPage_dependencyMap, dependencyMap);
+        return queryBuilder().criteria(q).updateFirst(update);
     }
 }

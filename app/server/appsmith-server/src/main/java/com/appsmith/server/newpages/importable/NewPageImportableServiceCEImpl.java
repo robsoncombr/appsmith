@@ -84,7 +84,7 @@ public class NewPageImportableServiceCEImpl implements ImportableServiceCE<NewPa
         // For git-sync this will not be empty
         Mono<List<NewPage>> existingPagesMono = importableArtifactMono
                 .flatMap(application -> newPageService
-                        .findNewPagesByApplicationId(application.getId(), Optional.empty())
+                        .findNewPagesByApplicationId(application.getId(), null)
                         .collectList())
                 .cache();
 
@@ -359,15 +359,10 @@ public class NewPageImportableServiceCEImpl implements ImportableServiceCE<NewPa
                         // This does not apply to the traditional import via file approach
                         return Flux.fromIterable(invalidPageIds)
                                 .flatMap(pageId -> {
-                                    return applicationPageService.deleteUnpublishedPageWithOptionalPermission(
-                                            pageId,
-                                            Optional.empty(),
-                                            Optional.empty(),
-                                            Optional.empty(),
-                                            Optional.empty());
+                                    return applicationPageService.deleteUnpublishedPage(pageId, null, null, null, null);
                                 })
                                 .flatMap(page -> newPageService
-                                        .archiveWithoutPermissionById(page.getId())
+                                        .archiveByIdWithoutPermission(page.getId())
                                         .onErrorResume(e -> {
                                             log.debug(
                                                     "Unable to archive page {} with error {}",
@@ -479,7 +474,7 @@ public class NewPageImportableServiceCEImpl implements ImportableServiceCE<NewPa
                             }
                             if (application.getGitApplicationMetadata() != null) {
                                 final String defaultApplicationId =
-                                        application.getGitApplicationMetadata().getDefaultApplicationId();
+                                        application.getGitApplicationMetadata().getDefaultArtifactId();
                                 return newPageService
                                         .findByGitSyncIdAndDefaultApplicationId(
                                                 defaultApplicationId, newPage.getGitSyncId(), Optional.empty())

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AnalyticsUtil from "utils/AnalyticsUtil";
+import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
 import { initExplorerEntityNameEdit } from "actions/explorerActions";
 import {
   clonePageInit,
@@ -54,9 +54,6 @@ export function PageContextMenu(props: {
   onItemSelected?: () => void;
 }) {
   const dispatch = useDispatch();
-  const isPartialImportExportEnabled = useFeatureFlag(
-    FEATURE_FLAG.release_show_partial_import_export_enabled,
-  );
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   /**
@@ -118,15 +115,8 @@ export function PageContextMenu(props: {
   );
 
   const showPartialImportExportInMenu = useMemo(
-    () =>
-      isPartialImportExportEnabled &&
-      props.hasExportPermission &&
-      props.isCurrentPage,
-    [
-      isPartialImportExportEnabled,
-      props.hasExportPermission,
-      props.isCurrentPage,
-    ],
+    () => props.hasExportPermission && props.isCurrentPage,
+    [props.hasExportPermission, props.isCurrentPage],
   );
 
   const handlePartialExportClick = () => {

@@ -1,18 +1,21 @@
 import {
+  UI_ELEMENT_PANEL_SEARCH_TEXT,
   WIDGET_PANEL_EMPTY_MESSAGE,
   createMessage,
 } from "@appsmith/constants/messages";
+import { FEATURE_FLAG } from "@appsmith/entities/FeatureFlag";
+import AnalyticsUtil from "@appsmith/utils/AnalyticsUtil";
 import { ENTITY_EXPLORER_SEARCH_ID } from "constants/Explorer";
 import type {
   WidgetCardsGroupedByTags,
   WidgetTags,
 } from "constants/WidgetConstants";
 import { WIDGET_TAGS } from "constants/WidgetConstants";
-import { SearchInput, Text } from "design-system";
+import { Flex, SearchInput, Text } from "design-system";
 import Fuse from "fuse.js";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import AnalyticsUtil from "utils/AnalyticsUtil";
+import { useFeatureFlag } from "utils/hooks/useFeatureFlag";
 import { groupWidgetCardsByTags } from "../utils";
 import UIEntityTagGroup from "./UIEntityTagGroup";
 import { useUIExplorerItems } from "./hooks";
@@ -29,7 +32,16 @@ function UIEntitySidebar({
     useState<WidgetCardsGroupedByTags>(groupedCards);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [isEmpty, setIsEmpty] = useState(false);
+  const [areSearchResultsEmpty, setAreSearchResultsEmpty] = useState(false);
+  const isDragDropBuildingBlocksEnabled = useFeatureFlag(
+    FEATURE_FLAG.release_drag_drop_building_blocks_enabled,
+  );
+  const hideSuggestedWidgets = useMemo(
+    () =>
+      (isSearching && !areSearchResultsEmpty) ||
+      isDragDropBuildingBlocksEnabled,
+    [isSearching, areSearchResultsEmpty, isDragDropBuildingBlocksEnabled],
+  );
 
   const searchWildcards = useMemo(
     () =>
@@ -71,11 +83,11 @@ function UIEntitySidebar({
           searchResult.length > 0 ? searchResult : searchWildcards,
         ),
       );
-      setIsEmpty(searchResult.length === 0);
+      setAreSearchResultsEmpty(searchResult.length === 0);
     } else {
       setFilteredCards(groupedCards);
       setIsSearching(false);
-      setIsEmpty(false);
+      setAreSearchResultsEmpty(false);
     }
   };
 
@@ -103,16 +115,17 @@ function UIEntitySidebar({
           autoComplete="off"
           id={ENTITY_EXPLORER_SEARCH_ID}
           onChange={search}
-          placeholder="Search widgets"
+          placeholder={createMessage(UI_ELEMENT_PANEL_SEARCH_TEXT)}
           ref={searchInputRef}
           type="text"
         />
       </div>
-      <div
-        className="flex-grow px-3 mt-2 overflow-y-scroll"
+      <Flex
+        className="flex-grow px-3 overflow-y-scroll flex-col"
         data-testid="t--widget-sidebar-scrollable-wrapper"
+        pt="spaces-2"
       >
-        {isEmpty && (
+        {areSearchResultsEmpty && (
           <Text
             color="#6A7585"
             kind="body-m"
@@ -131,11 +144,7 @@ function UIEntitySidebar({
               return null;
             }
 
-            if (
-              isSearching &&
-              tag === WIDGET_TAGS.SUGGESTED_WIDGETS &&
-              !isEmpty
-            ) {
+            if (tag === WIDGET_TAGS.SUGGESTED_WIDGETS && hideSuggestedWidgets) {
               return null;
             }
 
@@ -149,7 +158,7 @@ function UIEntitySidebar({
             );
           })}
         </div>
-      </div>
+      </Flex>
     </div>
   );
 }
