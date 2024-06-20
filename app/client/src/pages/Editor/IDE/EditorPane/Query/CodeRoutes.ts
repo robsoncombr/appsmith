@@ -11,7 +11,7 @@ import QueryEditor from "pages/Editor/QueryEditor";
 import { SAAS_EDITOR_API_ID_PATH } from "pages/Editor/SaaSEditor/constants";
 import CurlImportEditor from "pages/Editor/APIEditor/CurlImportEditor";
 import AddQuery from "./Add";
-import { BlankStateContainer } from "./BlankStateContainer";
+import ListQuery from "./List";
 
 export const CodeRoutes = (path: string) => [
   {
@@ -60,8 +60,8 @@ export const CodeRoutes = (path: string) => [
     path: [path + "/:queryId"],
   },
   {
-    key: "QueryEmpty",
-    component: BlankStateContainer,
+    key: "ListQuery",
+    component: ListQuery,
     exact: true,
     path: [path],
   },

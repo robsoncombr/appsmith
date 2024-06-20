@@ -1,7 +1,7 @@
 import AddJS from "./Add";
 import { ADD_PATH } from "@appsmith/constants/routes/appRoutes";
 import JSEditor from "pages/Editor/JSEditor";
-import { BlankStateContainer } from "./BlankStateContainer";
+import ListJSObjects from "./List";
 
 export const CodeRoutes = (path: string) => [
   {
@@ -17,8 +17,8 @@ export const CodeRoutes = (path: string) => [
     path: [path + "/:collectionId"],
   },
   {
-    key: "JSEmpty",
-    component: BlankStateContainer,
+    key: "JSList",
+    component: ListJSObjects,
     exact: true,
     path: [path],
   },
