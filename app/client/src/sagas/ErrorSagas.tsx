@@ -162,6 +162,7 @@ export interface ErrorPayloadType {
   message?: string;
   crash?: boolean;
 }
+
 const ActionErrorDisplayMap: {
   [key: string]: (error: ErrorPayloadType) => string;
 } = {
@@ -204,7 +205,7 @@ export interface ErrorActionPayload {
 export function* errorSaga(errorAction: ReduxAction<ErrorActionPayload>) {
   const effects = [ErrorEffectTypes.LOG_ERROR];
   const { payload, type } = errorAction;
-  const { error, logToSentry, show = true } = payload || {};
+  const { error, logToSentry, show = false } = payload || {};
   const message = getErrorMessageFromActionType(type, error);
 
   if (show) {
@@ -288,6 +289,7 @@ export function embedRedirectURL() {
     )}`;
   }
 }
+
 /**
  * this saga do some logic before actually setting safeCrash to true
  */

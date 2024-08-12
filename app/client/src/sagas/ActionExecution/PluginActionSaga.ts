@@ -1204,6 +1204,7 @@ function* executePageLoadAction(
           isPageLoad: true,
           error: { message: error.message },
           data: payload,
+          show: false,
         }),
       );
 
