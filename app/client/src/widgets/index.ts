@@ -81,6 +81,7 @@ import { WDSModalWidget } from "./wds/WDSModalWidget";
 import { WDSStatsWidget } from "./wds/WDSStatsWidget";
 import { WDSKeyValueWidget } from "./wds/WDSKeyValueWidget";
 import { WDSInlineButtonsWidget } from "./wds/WDSInlineButtonsWidget";
+import { WDSSelectWidget } from "./wds/WDSSelectWidget";
 
 const LegacyWidgets = [
   CanvasWidget,
@@ -173,6 +174,7 @@ const WDSWidgets = [
   WDSStatsWidget,
   WDSKeyValueWidget,
   WDSInlineButtonsWidget,
+  WDSSelectWidget,
 ];
 
 const Widgets = [
